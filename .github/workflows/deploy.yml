@@ -4,32 +4,34 @@ on:
   push:
     branches:
       - dev
+    paths:
+      - '**'
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux]
+    environment: production
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Setup SSH Key
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.DEPLOY_KEY }}" > ~/.ssh/deploy_key
-          chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -p 2312 10.88.12.3 >> ~/.ssh/known_hosts
-
       - name: Deploy Application
         run: |
-          ssh -i ~/.ssh/deploy_key -p 2312 kangudin@10.88.12.3 '
-            echo "SSH_OK"
-            cd /home/kangudin/pos-kasirpro
-            git pull origin dev
-            rsync -av --exclude=.env --exclude=storage --exclude=vendor . /opt/homelab/apps/kasirpro/
-            cd /opt/homelab/apps/kasirpro
-            docker compose -f docker-compose.prod.yml exec -T app composer install --no-interaction --prefer-dist --optimize-autoloader || true
-            docker compose -f docker-compose.prod.yml exec -T app php artisan migrate --force || true
-            docker compose -f docker-compose.prod.yml exec -T app php artisan optimize:clear || true
-            docker compose -f docker-compose.prod.yml restart app
-          '
+          echo "=== Pull changes ==="
+          cd /home/kangudin/pos-kasirpro
+          git pull origin dev 2>&1
+
+          echo "=== Sync to deployment ==="
+          rsync -av --exclude=.env --exclude=storage --exclude=vendor . /opt/homelab/apps/kasirpro/
+
+          echo "=== Composer install ==="
+          docker exec kasirpro-app bash -c 'cd /var/www/html && composer install --no-interaction --prefer-dist --optimize-autoloader 2>&1' || echo "composer skipped"
+
+          echo "=== Run migrations ==="
+          docker exec kasirpro-app php artisan migrate --force 2>&1 || echo "migrate skipped"
+
+          echo "=== Optimize ==="
+          docker exec kasirpro-app php artisan optimize:clear 2>&1 || echo "optimize skipped"
+
+          echo "=== Restart app ==="
+          docker compose -f /opt/homelab/apps/kasirpro/docker-compose.prod.yml restart app 2>&1
+
+          echo "=== Deploy complete ==="
