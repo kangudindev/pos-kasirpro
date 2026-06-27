@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Struk {{ $transaction->invoice_no }}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Courier New', monospace; font-size: 11px; width: 58mm; margin: 0 auto; }
+        .center { text-align: center; }
+        .right { text-align: right; }
+        .line { border-top: 1px dotted #000; margin: 3px 0; }
+        .bold { font-weight: bold; }
+        table { width: 100%; }
+        td { padding: 1px 0; }
+        .header { font-size: 14px; font-weight: bold; }
+        @media print { body { width: 58mm; } .no-print { display: none; } }
+    </style>
+</head>
+<body>
+    <div class="no-print mb-2"><button onclick="window.print()" class="btn btn-sm btn-primary">Print</button></div>
+    <div class="center">
+        <div class="header">{{ $transaction->location->business->name ?? 'POS KasirPro' }}</div>
+        <p>{{ $transaction->location->name ?? '' }}</p>
+    </div>
+    <div class="line"></div>
+    <table>
+        <tr><td>#{{ $transaction->invoice_no }}</td><td class="right">{{ \App\Utils\Util::format_datetime($transaction->transaction_date, 'd/m/Y H:i') }}</td></tr>
+    </table>
+    <div class="line"></div>
+    <table>
+        @foreach($lines as $line)
+        <tr><td>{{ substr($line->product->name ?? '', 0, 12) }}</td><td class="right">{{ $line->quantity }} x {{ number_format($line->unit_price, 0, ',', '.') }}</td></tr>
+        <tr><td></td><td class="right bold">{{ number_format($line->quantity * $line->unit_price, 0, ',', '.') }}</td></tr>
+        @endforeach
+    </table>
+    <div class="line"></div>
+    <table>
+        <tr><td>TOTAL</td><td class="right bold">Rp {{ number_format($transaction->final_total, 0, ',', '.') }}</td></tr>
+    </table>
+    <div class="line"></div>
+    <div class="center"><p>Terima Kasih</p></div>
+</body>
+</html>

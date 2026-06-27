@@ -1,0 +1,144 @@
+# DreamsPOS v2.0.6 Template — Design PRD Overview
+
+**Versi:** 2.0.6  
+**Tanggal:** Juni 2026  
+**Platform:** Laravel 9 (PHP 8.0+) + Bootstrap 5 + jQuery
+
+---
+
+## 1. KONSEP & ARSITEKTUR DESAIN
+
+### 1.1 Overview
+DreamsPOS v2.0.6 adalah sebuah template aplikasi yang dirancang sebagai solusi Point-of-Sale (POS) dan manajemen bisnis yang komprehensif. Fokus utamanya adalah pada UI/UX yang intuitif, fungsionalitas yang kaya, dan arsitektur frontend yang modular.
+
+### 1.2 Target Pengguna Desain
+- **Administrator Sistem**:
+  - Membutuhkan dashboard yang informatif dan mudah dinavigasi.
+  - Memerlukan akses ke pengaturan sistem, manajemen pengguna, dan laporan detail.
+- **Staff POS**:
+  - Membutuhkan interface transaksi yang cepat dan efisien.
+  - Akses mudah ke pencarian produk, pemilihan pelanggan, dan metode pembayaran.
+- **Manajer Bisnis**:
+  - Membutuhkan laporan visual (grafik) dan ringkasan performa bisnis.
+  - Membutuhkan alat untuk mengelola inventaris, keuangan, dan HR.
+
+### 1.3 Value Proposition Desain
+1. **Intuitive & Efficient UI**: Desain yang bersih, modern, dan berfokus pada alur kerja pengguna yang efisien.
+2. **Comprehensive Feature Set**: Menyediakan UI untuk berbagai modul bisnis (POS, Inventory, Finance, HR, Communication).
+3. **High Configurability**: Kemampuan untuk beralih antara tema terang & gelap, menyesuaikan tata letak.
+4. **Responsive Design**: Adaptif di berbagai ukuran layar.
+5. **Developer Friendly**: Arsitektur modular (SCSS, Blade, Vite) memudahkan kustomisasi dan pengembangan.
+
+### 1.4 Technology Stack (Frontend)
+- **Backend Rendering**: Laravel Blade (PHP 8.0+)
+- **CSS Framework**: Bootstrap 5
+- **CSS Preprocessor**: SCSS (dengan arsitektur modular 7-1)
+- **JavaScript Core**: jQuery 3.7.1
+- **Bundler**: Vite
+- **Charting Library**: ApexCharts
+- **Data Tables**: Yajra DataTables (dengan integrasi Bootstrap 5)
+- **Icon Library**: Feather Icons, FontAwesome, Boxicons
+
+---
+
+## 2. SISTEM DESAIN & VISUAL
+
+### 2.1 Color Palette
+- **Primary**: `#FF9F43` (Amber/Orange, 9-tier shades)
+- **Secondary**: `#092C4C` (Navy Blue)
+- **Semantic**: Success (`#28C76F`), Info (`#17a2b8`), Warning (`#FF9900`), Danger (`#FF0000`), Dark (`#29344a`), Light (`#f8f9fa`).
+- **Grayscale**: `#f3f6f9` (lightest) to `#212529` (darkest).
+- **Dark Theme**: Background utama `#141432`, background card `#1d1d42`.
+- **Gradients**: Disediakan untuk warna primer & sekunder.
+
+### 2.2 Typography
+- **Primary Font**: 'Nunito', sans-serif (base `14px`).
+- **Secondary Font**: 'Poppins', sans-serif.
+- **Headings**: `h1` (32px) to `h6` (16px), dengan class utility `fs-1` hingga `fs-60`.
+- **Weights**: Variatif dari Light (300) hingga Bold (700).
+
+### 2.3 Spacing & Layout
+- **Border Radii**: Empat level (sm, default, lg, xl, xxl, full).
+- **Box Shadows**: Tiga level (sm, default, lg).
+- **Grid System**: Bootstrap 5 (container fluid, `col-*` classes).
+- **Responsive Breakpoints**: xs, sm, md, lg, dengan custom breakpoints untuk kontrol lebih granular.
+
+### 2.4 UI Components
+- **Cards**: Versatile base card (`.card`) dengan varian berwarna (`.card-bg-*`) dan widget dashboard (`.dash-widget`).
+- **Buttons**: Solid (`.btn-primary`), soft (`.btn-soft-primary`), ghost (`.btn-primary-ghost`), outline (`.btn-outline-primary`) dengan state hover & active yang halus.
+- **Forms**: Styled dengan `.form-control`, validation state (`.is-invalid`), floating labels, dan OTP input khusus.
+- **Tables**: Bootstrap tables, integrasi DataTables dengan styling responsif dan tombol ekspor.
+- **Modals**: Custom modal (`.modal`) dengan styling title, footer, dan animasi fade/slide.
+- **Badges & Labels**: Ukuran bervariasi (xs-xl) dengan varian solid, soft, dan outline.
+- **Icons**: Feather Icons (utama), FontAwesome, Boxicons terintegrasi melalui `data-feather` attributes dan inline SVG.
+
+### 2.5 Visual Elements & Interactions
+- **Animations**: Transisi halus pada button, modal, dan perubahan tema (0.5s, 0.2s).
+- **Loading States**: Loader global (`#global-loader`) dan animasi loading pada widget dashboard.
+- **Tooltips**: Digunakan untuk informasi tambahan dan deskripsi ikon.
+- **Image Handling**: Placeholder terorganisir, fancybox untuk lightbox, dan karosel produk.
+
+---
+
+## 3. ARSITEKTUR FRONTEND
+
+### 3.1 Struktur File & Modularitas
+- **SCSS**: Arsitektur 7-1 modular (`main.scss` mengimpor 7 folder utama: `vendors`, `base`, `layout`, `pages`, `components`, `utilities`, `themes`).
+- **JavaScript**: Plugin pihak ketiga dikumpulkan di `public/build/plugins`, script kustom di `resources/js/`.
+- **Views**: Laravel Blade, dengan layout utama (`layout/mainlayout.blade.php`) dan komponen reusable (`layout/partials/`).
+
+### 3.2 Asset Management
+- **Vite**: Digunakan untuk bundling CSS (main.css) & JS (script.js), minifikasi, dan cache busting.
+- **Static Assets**: CSS, JS plugins, fonts, dan images disalin ke `public/build/` melalui `vite-plugin-static-copy`.
+
+### 3.3 Template Engine & Komponen
+- **Blade**: Menggunakan layout inheritance (`@extends`, `@section`) dan komponen (`@component`) untuk breadcrumbs.
+- **Conditional Asset Loading**: CSS/JS dimuat berdasarkan route saat ini untuk optimasi.
+
+### 3.4 JavaScript & Interaktivitas
+- **jQuery**: Digunakan secara ekstensif untuk DOM manipulation, AJAX, dan event handling.
+- **Bootstrap JS**: Untuk komponen seperti modal, dropdown, collapse.
+- **Custom JS (`resources/js/script.js`)**: Inisialisasi plugin (sidebar toggle, carousels, datatables, charts, theme settings).
+- **Theme Settings (`resources/js/theme-settings.js`)**: Mengelola peralihan tema (terang/gelap) dan layout via `localStorage`.
+
+---
+
+## 4. FITUR UTAMA & UI IMPLEMENTATION
+
+### 4.1 Dashboard
+- **Tampilan**: Ringkasan bisnis, grafik penjualan & pembelian (ApexCharts), statistik kartu (`dash-widget`), widget dinamis.
+- **Interaktivitas**: Animasi angka (`counter-up.js`), filter tanggal.
+
+### 4.2 POS Interface (`pos.blade.php`)
+- **Layout**: Sidebar navigasi, header, area produk (kategori, daftar produk), area cart (item, jumlah, total), area pembayaran.
+- **Interaktivitas**: Pencarian produk real-time, keyboard shortcuts (F2, F4, Enter), kalkulasi cart dinamis, pemilihan multi-payment, integrasi modal printer/payment gateway.
+- **Desain**: Mobile-first approach dengan penyesuaian untuk layar besar.
+
+### 4.3 Forms & Data Input
+- **Standardisasi**: Konsisten di seluruh aplikasi, menggunakan style Bootstrap 5 dengan sentuhan tema (warna primer, radius border).
+- **Validation UI**: Indikator visual jelas (`.is-invalid`, red border) dan pesan error.
+- **Select2**: Enhanced dropdown untuk field dengan banyak pilihan (misal: produk, customer).
+
+### 4.4 Tables & Data Grids
+- **DataTables**: Fitur sorting, searching, pagination, dan export (Excel, PDF, CSV) diimplementasikan untuk semua tabel data (penjualan, pembelian, produk, dll.).
+- **Responsiveness**: Tabel scrollable di layar kecil, dengan tampilan ringkas.
+
+### 4.5 Modals & Popups
+- **SweetAlert2**: Untuk konfirmasi aksi penting (hapus, simpan).
+- **Custom Modals**: Untuk detail spesifik (misal: input OTP, barcode generation).
+- **Theme Settings Panel**: Sidebar slide-out untuk konfigurasi layout & tema.
+
+### 4.6 Navigation & Menus
+- **Sidebar**: Navigasi utama, collapsible, dengan highlight state yang jelas (orange tint).
+- **Header**: Search global, notifikasi, user profile, store switcher.
+- **Breadcrumbs**: Konsisten di setiap halaman sekunder.
+
+### 4.7 Reporting UI
+- **Interaktif**: Filter tanggal, dropdown filter (lokasi, customer), tombol ekspor.
+- **Visualisasi**: Grafik ApexCharts untuk data agregat.
+
+---
+
+## 5. KESIMPULAN DESAIN
+
+DreamsPOS v2.0.6 menawarkan template yang kuat dengan fokus pada pengalaman pengguna yang kaya dan efisien. Sistem desainnya terstruktur dengan baik (Bootstrap 5 + SCSS modular), mendukung kustomisasi tema dan layout. Frontend-nya menggunakan kombinasi jQuery dan Laravel Blade, didukung oleh Vite untuk asset bundling. Template ini siap diadopsi untuk aplikasi POS yang membutuhkan UI modern, fungsionalitas lengkap, dan arsitektur yang mudah dikembangkan.

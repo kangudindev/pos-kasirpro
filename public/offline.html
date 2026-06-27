@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KasirPro - Offline</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #092C4C 0%, #1a3a5c 100%); min-height: 100vh; display: flex; align-items: center; justify-content: center; color: #fff; }
+        .container { text-align: center; padding: 40px; }
+        .icon { font-size: 80px; margin-bottom: 20px; }
+        h1 { font-size: 32px; margin-bottom: 16px; }
+        p { font-size: 16px; opacity: 0.8; margin-bottom: 24px; }
+        .btn { background: #FF9F43; color: #fff; padding: 12px 32px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; text-decoration: none; display: inline-block; }
+        .btn:hover { background: #e68a2e; }
+        .retry-btn { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">📡</div>
+        <h1>Anda Sedang Offline</h1>
+        <p>Tidak ada koneksi internet. Data Anda tersimpan dan akan disinkronkan saat kembali online.</p>
+        <a href="/dashboard" class="btn">Coba Lagi</a>
+        <button class="btn retry-btn" onclick="location.reload()">Refresh Halaman</button>
+    </div>
+</body>
+</html>

@@ -1,0 +1,98 @@
+services:
+  app:
+    image: dunglas/frankenphp:latest-php8.3
+    container_name: kasirpro-app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    ports:
+      - "8000:8000"
+      - "443:443"
+      - "2019:2019"  # FrankenPHP metrics
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_URL: http://localhost:8000
+      SERVER_NAME: localhost
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: kasirpro
+      DB_USERNAME: kasirpro
+      DB_PASSWORD: secret
+      REDIS_HOST: redis
+      CACHE_DRIVER: redis
+      SESSION_DRIVER: redis
+      QUEUE_CONNECTION: redis
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - kasirpro-network
+    command: >
+      frankenphp run
+      --worker
+      --listen 0.0.0.0:8000
+      public/index.php
+
+  mysql:
+    image: mysql:8.0
+    container_name: kasirpro-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: kasirpro
+      MYSQL_USER: kasirpro
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: rootsecret
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - kasirpro-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: kasirpro-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: redis-server --appendonly yes
+    networks:
+      - kasirpro-network
+
+  node:
+    image: node:20-alpine
+    container_name: kasirpro-node
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - ./scale-bridge:/app
+    ports:
+      - "3000:3000"
+    command: node server.js
+    networks:
+      - kasirpro-network
+
+volumes:
+  mysql-data:
+  redis-data:
+
+networks:
+  kasirpro-network:
+    driver: bridge

@@ -1,0 +1,104 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: kasirpro-app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - APP_URL=https://pos.kasirpro.eu.cc
+      - SERVER_NAME=:80
+      - DB_CONNECTION=mysql
+      - DB_HOST=mysql
+      - DB_PORT=3306
+      - DB_DATABASE=kasirpro
+      - DB_USERNAME=kasirpro
+      - DB_PASSWORD=${DB_PASSWORD:-kasirpro123}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - CACHE_DRIVER=redis
+      - SESSION_DRIVER=redis
+      - QUEUE_CONNECTION=redis
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.kasirpro.rule=Host(`pos.kasirpro.eu.cc`)"
+      - "traefik.http.routers.kasirpro.entrypoints=web"
+      - "traefik.http.services.kasirpro.loadbalancer.server.port=80"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - proxy
+      - kasirpro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  mysql:
+    image: mysql:8.0
+    container_name: kasirpro-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: kasirpro
+      MYSQL_USER: kasirpro
+      MYSQL_PASSWORD: ${DB_PASSWORD:-kasirpro123}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootsecret}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - kasirpro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: kasirpro-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-redis123}
+    volumes:
+      - redis-data:/data
+    networks:
+      - kasirpro
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-redis123}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  scale-bridge:
+    image: node:20-alpine
+    container_name: kasirpro-scale-bridge
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - ./scale-bridge:/app
+    command: node server.js
+    environment:
+      - BRIDGE_PORT=3000
+      - LARAVEL_URL=http://app:8000
+    ports:
+      - "3000:3000"
+    networks:
+      - kasirpro
+
+volumes:
+  mysql-data:
+  redis-data:
+
+networks:
+  proxy:
+    external: true
+  kasirpro:
+    driver: bridge

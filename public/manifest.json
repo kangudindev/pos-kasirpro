@@ -1,0 +1,25 @@
+{
+    "name": "KasirPro POS",
+    "short_name": "KasirPro",
+    "description": "Point of Sale System for Supermarket and Retail",
+    "start_url": "/dashboard",
+    "display": "standalone",
+    "background_color": "#092C4C",
+    "theme_color": "#FF9F43",
+    "orientation": "any",
+    "icons": [
+        {
+            "src": "/build/img/logo-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/build/img/logo-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "categories": ["business", "finance", "productivity"],
+    "lang": "id",
+    "scope": "/"
+}
