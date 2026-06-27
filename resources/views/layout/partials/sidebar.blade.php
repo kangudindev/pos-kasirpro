@@ -76,6 +76,30 @@
                     </ul>
                 </li>
                 <li class="submenu-open">
+                    <h6 class="submenu-hdr">Barcode Center</h6>
+                    <ul>
+                        <li class="{{ request()->routeIs('barcode-center.*') ? 'active' : '' }}">
+                            <a href="{{ route('barcode-center.index') }}"><i data-feather="grid"></i><span>Barcode Center</span></a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="submenu-open">
+                    <h6 class="submenu-hdr">Scale</h6>
+                    <ul>
+                        <li class="{{ request()->routeIs('scales.*') ? 'active' : '' }}">
+                            <a href="{{ route('scales.index') }}"><i data-feather="scale"></i><span>Scales</span></a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="submenu-open">
+                    <h6 class="submenu-hdr">Marketplace</h6>
+                    <ul>
+                        <li class="{{ request()->routeIs('marketplace.*') ? 'active' : '' }}">
+                            <a href="{{ route('marketplace.index') }}"><i data-feather="shopping-cart"></i><span>Marketplace</span></a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="submenu-open">
                     <h6 class="submenu-hdr">Reports</h6>
                     <ul>
                         <li class="{{ request()->routeIs('reports.*') ? 'active' : '' }}">

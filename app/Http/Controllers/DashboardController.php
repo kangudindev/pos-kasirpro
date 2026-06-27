@@ -45,10 +45,15 @@ class DashboardController extends Controller
             ->where('type', 'customer')
             ->count();
 
-        // Low stock products
-        $lowStockProducts = Product::where('business_id', $businessId)
-            ->where('enable_stock', true)
-            ->where('alert_quantity', '>', 0)
+        // Low stock products (count products with stock below alert threshold)
+        $lowStockProducts = DB::table('transaction_sell_lines')
+            ->select('product_id')
+            ->whereIn('transaction_id', function ($query) use ($businessId) {
+                $query->select('id')->from('transactions')
+                    ->where('business_id', $businessId)->where('type', 'sell');
+            })
+            ->groupBy('product_id')
+            ->havingRaw('SUM(quantity) < (SELECT alert_quantity FROM products WHERE products.id = product_id)')
             ->count();
 
         // Recent sales
@@ -59,9 +64,9 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        // Top selling products
-        $topProducts = DB::table('transaction_sell_lines')
-            ->select('product_id', DB::raw('SUM(quantity) as total_qty'), DB::raw('SUM(quantity * unit_price) as total_revenue'))
+        // Top selling products - eager load products
+        $topProductIds = DB::table('transaction_sell_lines')
+            ->select('product_id')
             ->whereIn('transaction_id', function ($query) use ($businessId) {
                 $query->select('id')
                     ->from('transactions')
@@ -69,9 +74,34 @@ class DashboardController extends Controller
                     ->where('type', 'sell');
             })
             ->groupBy('product_id')
-            ->orderByDesc('total_revenue')
+            ->orderByDesc(DB::raw('SUM(quantity * unit_price)'))
             ->limit(5)
-            ->get();
+            ->pluck('product_id');
+
+        $topProducts = Product::whereIn('id', $topProductIds)
+            ->with(['sellableVariations'])
+            ->get()
+            ->mapWithKeys(function ($product) use ($businessId) {
+                $qty = DB::table('transaction_sell_lines')
+                    ->where('product_id', $product->id)
+                    ->whereIn('transaction_id', function ($q) use ($businessId) {
+                        $q->select('id')->from('transactions')
+                          ->where('business_id', $businessId)->where('type', 'sell');
+                    })
+                    ->sum('quantity');
+
+                $revenue = DB::table('transaction_sell_lines')
+                    ->where('product_id', $product->id)
+                    ->whereIn('transaction_id', function ($q) use ($businessId) {
+                        $q->select('id')->from('transactions')
+                          ->where('business_id', $businessId)->where('type', 'sell');
+                    })
+                    ->sum(DB::raw('quantity * unit_price'));
+
+                return [$product->id => ['product_id' => $product->id, 'total_qty' => $qty, 'total_revenue' => $revenue]];
+            })
+            ->sortByDesc('total_revenue')
+            ->values();
 
         // Sales chart data (last 7 days)
         $chartData = Transaction::where('business_id', $businessId)

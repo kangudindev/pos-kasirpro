@@ -28,7 +28,7 @@ class ProductController extends Controller
     {
         $businessId = session('current_business_id');
 
-        $query = Product::with(['category', 'brand', 'unit'])
+        $query = Product::with(['category', 'brand', 'unit', 'sellableVariations.locationDetails'])
             ->where('business_id', $businessId);
 
         if ($request->filled('search')) {
