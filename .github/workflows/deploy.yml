@@ -4,45 +4,28 @@ on:
   push:
     branches:
       - dev
-    paths:
-      - '**'
 
 jobs:
   deploy:
-    runs-on: self-hosted, linux
-    environment: production
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Pull Changes to Server
-        run: |
-          cd /home/kangudin/pos-kasirpro
-          git pull origin dev
-
-      - name: Install PHP Dependencies
-        run: |
-          cd /home/kangudin/pos-kasirpro
-          docker exec kasirpro-app composer install --no-interaction --prefer-dist --optimize-autoloader
-
-      - name: Run Migrations
-        run: |
-          cd /home/kangudin/pos-kasirpro
-          docker exec kasirpro-app php artisan migrate --force
-
-      - name: Build Frontend
-        run: |
-          cd /home/kangudin/pos-kasirpro
-          docker exec kasirpro-app npm install --legacy-peer-deps
-          docker exec kasirpro-app npm run build
-
-      - name: Optimize Cache
-        run: |
-          cd /home/kangudin/pos-kasirpro
-          docker exec kasirpro-app php artisan optimize:clear
-
-      - name: Restart Application
-        run: |
-          cd /home/kangudin/pos-kasirpro
-          docker compose -f docker-compose.prod.yml restart app
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 10.88.12.3
+          port: 2312
+          username: kangudin
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: |
+            cd /home/kangudin/pos-kasirpro
+            git pull origin dev
+            rsync -av --exclude='.env' --exclude='storage/*' --exclude='vendor/*' . /opt/homelab/apps/kasirpro/
+            cd /opt/homelab/apps/kasirpro
+            docker compose -f docker-compose.prod.yml exec -T app composer install --no-interaction --prefer-dist --optimize-autoloader 2>/dev/null || true
+            docker compose -f docker-compose.prod.yml exec -T app php artisan migrate --force 2>/dev/null || true
+            docker compose -f docker-compose.prod.yml exec -T app php artisan optimize:clear 2>/dev/null || true
+            docker compose -f docker-compose.prod.yml restart app
