@@ -20,12 +20,20 @@ jobs:
           port: 2312
           username: kangudin
           key: ${{ secrets.DEPLOY_KEY }}
+          host_key_checking: false
           script: |
+            set -e
+            echo "=== Update repo ==="
             cd /home/kangudin/pos-kasirpro
             git pull origin dev
+
+            echo "=== Sync files ==="
             rsync -av --exclude='.env' --exclude='storage/*' --exclude='vendor/*' . /opt/homelab/apps/kasirpro/
+
+            echo "=== Deploy ==="
             cd /opt/homelab/apps/kasirpro
-            docker compose -f docker-compose.prod.yml exec -T app composer install --no-interaction --prefer-dist --optimize-autoloader 2>/dev/null || true
-            docker compose -f docker-compose.prod.yml exec -T app php artisan migrate --force 2>/dev/null || true
-            docker compose -f docker-compose.prod.yml exec -T app php artisan optimize:clear 2>/dev/null || true
+            docker compose -f docker-compose.prod.yml exec -T app composer install --no-interaction --prefer-dist --optimize-autoloader || echo "composer skipped"
+            docker compose -f docker-compose.prod.yml exec -T app php artisan migrate --force || echo "migrate skipped"
+            docker compose -f docker-compose.prod.yml exec -T app php artisan optimize:clear || echo "optimize skipped"
             docker compose -f docker-compose.prod.yml restart app
+            echo "=== Deploy completed ==="
