@@ -20,7 +20,6 @@ jobs:
           port: 2312
           username: kangudin
           key: ${{ secrets.DEPLOY_KEY }}
-          host_key_checking: false
           script: |
             set -e
             echo "=== Update repo ==="
@@ -28,7 +27,7 @@ jobs:
             git pull origin dev
 
             echo "=== Sync files ==="
-            rsync -av --exclude='.env' --exclude='storage/*' --exclude='vendor/*' . /opt/homelab/apps/kasirpro/
+            rsync -av --exclude='.env' --exclude='storage' --exclude='vendor' . /opt/homelab/apps/kasirpro/
 
             echo "=== Deploy ==="
             cd /opt/homelab/apps/kasirpro
