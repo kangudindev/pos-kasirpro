@@ -1,0 +1,48 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - '**'
+
+jobs:
+  deploy:
+    runs-on: self-hosted, linux
+    environment: production
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Pull Changes to Server
+        run: |
+          cd /home/kangudin/pos-kasirpro
+          git pull origin dev
+
+      - name: Install PHP Dependencies
+        run: |
+          cd /home/kangudin/pos-kasirpro
+          docker exec kasirpro-app composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Run Migrations
+        run: |
+          cd /home/kangudin/pos-kasirpro
+          docker exec kasirpro-app php artisan migrate --force
+
+      - name: Build Frontend
+        run: |
+          cd /home/kangudin/pos-kasirpro
+          docker exec kasirpro-app npm install --legacy-peer-deps
+          docker exec kasirpro-app npm run build
+
+      - name: Optimize Cache
+        run: |
+          cd /home/kangudin/pos-kasirpro
+          docker exec kasirpro-app php artisan optimize:clear
+
+      - name: Restart Application
+        run: |
+          cd /home/kangudin/pos-kasirpro
+          docker compose -f docker-compose.prod.yml restart app
