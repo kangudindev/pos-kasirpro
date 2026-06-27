@@ -41,53 +41,53 @@
                     </div>
                 </div>
 
-                <div class="card mb-0" id="filter_inputs">
-                    <div class="card-body pb-0">
+        <div class="card mb-0" id="filter_inputs">
+            <div class="card-body pb-0">
+                <div class="row">
+                    <div class="col-lg-12 col-sm-12">
                         <div class="row">
+                            <div class="col-lg-4 col-sm-6 col-12">
+                                <div class="input-blocks">
+                                    <i data-feather="box" class="info-img"></i>
+                                    <select class="select" id="filter-category">
+                                        <option value="">All Categories</option>
+                                        @foreach($categories as $cat)
+                                        <option value="{{ $cat->id }}">{{ $cat->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-6 col-12">
+                                <div class="input-blocks">
+                                    <i data-feather="tag" class="info-img"></i>
+                                    <select class="select" id="filter-brand">
+                                        <option value="">All Brands</option>
+                                        @foreach($brands as $brand)
+                                        <option value="{{ $brand->id }}">{{ $brand->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4 col-sm-6 col-12">
+                                <div class="input-blocks">
+                                    <i data-feather="box" class="info-img"></i>
+                                    <select class="select" id="filter-status">
+                                        <option value="">All Status</option>
+                                        <option value="1">Active</option>
+                                        <option value="0">Inactive</option>
+                                    </select>
+                                </div>
+                            </div>
                             <div class="col-lg-12 col-sm-12">
-                                <div class="row">
-                                    <div class="col-lg-3 col-sm-6 col-12">
-                                        <div class="input-blocks">
-                                            <i data-feather="box" class="info-img"></i>
-                                            <select class="select" id="filter-category">
-                                                <option value="">All Categories</option>
-                                                @foreach($categories as $cat)
-                                                <option value="{{ $cat->id }}">{{ $cat->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-3 col-sm-6 col-12">
-                                        <div class="input-blocks">
-                                            <i data-feather="tag" class="info-img"></i>
-                                            <select class="select" id="filter-brand">
-                                                <option value="">All Brands</option>
-                                                @foreach($brands as $brand)
-                                                <option value="{{ $brand->id }}">{{ $brand->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-3 col-sm-6 col-12">
-                                        <div class="input-blocks">
-                                            <i data-feather="box" class="info-img"></i>
-                                            <select class="select" id="filter-status">
-                                                <option value="">All Status</option>
-                                                <option value="1">Active</option>
-                                                <option value="0">Inactive</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-3 col-sm-6 col-12">
-                                        <div class="input-blocks">
-                                            <a class="btn btn-filters ms-auto" id="btn-filter-search"> <i data-feather="search" class="feather-search"></i> Search </a>
-                                        </div>
-                                    </div>
+                                <div class="input-blocks mt-2">
+                                    <a class="btn btn-filters" id="btn-filter-search"> <i data-feather="search" class="feather-search"></i> Search </a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
 
                 <div class="table-responsive">
                     <table class="table datanew">
