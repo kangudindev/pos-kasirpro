@@ -6,6 +6,7 @@
         <div class="welcome d-lg-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center welcome-text">
                 <h3 class="d-flex align-items-center"><img src="{{ URL::asset('/build/img/icons/hi.svg') }}" alt="img">&nbsp;Hi {{ Auth::user()->name ?? 'User' }},</h3>&nbsp;<h6>here's what's happening with your store today. (Auto-Deploy via GitHub Actions ✅)</h6>
+                <small class="text-muted ms-2">Last deploy: {{ now()->format('d M Y H:i') }}</small>
             </div>
             <div class="d-flex align-items-center">
                 <span class="text-muted">{{ now()->format('d M Y') }}</span>
